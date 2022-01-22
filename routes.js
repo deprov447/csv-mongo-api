@@ -47,6 +47,13 @@ router.post("/create", (req, res) => {
 });
 
 // Read
+router.get("/read/num=:num", async (req, res) => {
+  const { num } = req.params;
+  const data = await People.find({}).limit(num);
+  console.log(data);
+  res.json({});
+});
+
 // Update
 // Delete
 
