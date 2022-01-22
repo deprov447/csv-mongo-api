@@ -11,9 +11,7 @@ mongoose.connect(
     useNewUrlParser: true,
     useUnifiedTopology: true,
   },
-  () => {
-    console.log("Connection to DB successful");
-  }
+  () => console.log("Connection to DB successful")
 );
 
 const router = require("./routes");

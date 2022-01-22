@@ -46,8 +46,8 @@ router.post("/", (req, res) => {
     });
 });
 
-// Read
-router.get("/num=:num", async (req, res) => {
+// Read by quantity
+router.get("/num=:num", (req, res) => {
   const { num } = req.params;
   People.find({})
     .limit(num)
@@ -65,8 +65,8 @@ router.get("/num=:num", async (req, res) => {
     });
 });
 
-// Read
-router.get("/id=:id", async (req, res) => {
+// Read by id
+router.get("/id=:id", (req, res) => {
   const { id } = req.params;
   People.findById(id)
     .then((data) => {
@@ -83,7 +83,7 @@ router.get("/id=:id", async (req, res) => {
 });
 
 // Update
-router.post("/id=:id", async (req, res) => {
+router.post("/id=:id", (req, res) => {
   const { id } = req.params;
   People.findByIdAndUpdate(id, req.body)
     .then((data) => {
@@ -100,7 +100,7 @@ router.post("/id=:id", async (req, res) => {
 });
 
 // Delete
-router.delete("/id=:id", async (req, res) => {
+router.delete("/id=:id", (req, res) => {
   const { id } = req.params;
   People.findByIdAndDelete(id)
     .then((data) => {
