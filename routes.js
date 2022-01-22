@@ -7,12 +7,10 @@ const People = require("./schema/sampleSchema");
 
 const router = express();
 const upload = multer({ dest: "public/upload/" });
-router.use(upload.array());
-
 router.use(express.json());
 
 // Send CSV to DB
-router.post("/upload", upload.single("csvFile"), async (req, res) => {
+router.put("/", upload.single("csvFile"), async (req, res) => {
   const { path: filePath } = req.file;
   const parsedObject = await fileParser(filePath);
 
@@ -31,14 +29,16 @@ router.post("/upload", upload.single("csvFile"), async (req, res) => {
     });
 });
 
+router.use(upload.array());
+
 // Create
-router.post("/create", (req, res) => {
+router.post("/", (req, res) => {
   const data = new People(req.body);
   data
     .save()
-    .then(() => {
+    .then(({ _id }) => {
       res.sendStatus(201);
-      console.log("New doc added to DB");
+      console.log(`New doc added to DB with id=${_id}`);
     })
     .catch((err) => {
       res.sendStatus(500);
@@ -47,14 +47,73 @@ router.post("/create", (req, res) => {
 });
 
 // Read
-router.get("/read/num=:num", async (req, res) => {
+router.get("/num=:num", async (req, res) => {
   const { num } = req.params;
-  const data = await People.find({}).limit(num);
-  console.log(data);
-  res.json({});
+  People.find({})
+    .limit(num)
+    .then((data) => {
+      if (data == null) res.sendStatus(404);
+      else {
+        if (data.length < num) res.status(206);
+        console.log(`Send first ${Math.min(num, data.length)} documents`);
+        res.json(data);
+      }
+    })
+    .catch((err) => {
+      res.sendStatus(500);
+      throw err;
+    });
+});
+
+// Read
+router.get("/id=:id", async (req, res) => {
+  const { id } = req.params;
+  People.findById(id)
+    .then((data) => {
+      if (data == null) res.sendStatus(404);
+      else {
+        console.log(`Send document with id=${id}`);
+        res.json(data);
+      }
+    })
+    .catch((err) => {
+      res.sendStatus(500);
+      throw err;
+    });
 });
 
 // Update
+router.post("/id=:id", async (req, res) => {
+  const { id } = req.params;
+  People.findByIdAndUpdate(id, req.body)
+    .then((data) => {
+      if (data == null) res.sendStatus(404);
+      else {
+        res.sendStatus(200);
+        console.log(`Updated document with id=${id}`);
+      }
+    })
+    .catch((err) => {
+      res.sendStatus(500);
+      throw err;
+    });
+});
+
 // Delete
+router.delete("/id=:id", async (req, res) => {
+  const { id } = req.params;
+  People.findByIdAndDelete(id)
+    .then((data) => {
+      if (data == null) res.sendStatus(404);
+      else {
+        res.sendStatus(200);
+        console.log(`Deleted document with id=${id}`);
+      }
+    })
+    .catch((err) => {
+      res.sendStatus(500);
+      throw err;
+    });
+});
 
 module.exports = router;
