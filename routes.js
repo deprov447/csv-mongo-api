@@ -3,7 +3,9 @@ const { unlink } = require("fs");
 const multer = require("multer");
 
 const fileParser = require("./fileParser");
+const { signin, signup } = require("./authController");
 const People = require("./schema/sampleSchema");
+const authWare = require("./authMiddleware");
 
 const router = express();
 const upload = multer({ dest: "public/upload/" });
@@ -32,7 +34,7 @@ router.put("/", upload.single("csvFile"), async (req, res) => {
 router.use(upload.array());
 
 // Create
-router.post("/", (req, res) => {
+router.post("/", authWare, (req, res) => {
   const data = new People(req.body);
   data
     .save()
@@ -47,7 +49,7 @@ router.post("/", (req, res) => {
 });
 
 // Read by quantity
-router.get("/num=:num", (req, res) => {
+router.get("/num=:num", authWare, (req, res) => {
   const { num } = req.params;
   People.find({})
     .limit(num)
@@ -66,7 +68,7 @@ router.get("/num=:num", (req, res) => {
 });
 
 // Read by id
-router.get("/id=:id", (req, res) => {
+router.get("/id=:id", authWare, (req, res) => {
   const { id } = req.params;
   People.findById(id)
     .then((data) => {
@@ -83,7 +85,7 @@ router.get("/id=:id", (req, res) => {
 });
 
 // Update
-router.post("/id=:id", (req, res) => {
+router.post("/id=:id", authWare, (req, res) => {
   const { id } = req.params;
   People.findByIdAndUpdate(id, req.body)
     .then((data) => {
@@ -100,7 +102,7 @@ router.post("/id=:id", (req, res) => {
 });
 
 // Delete
-router.delete("/id=:id", (req, res) => {
+router.delete("/id=:id", authWare, (req, res) => {
   const { id } = req.params;
   People.findByIdAndDelete(id)
     .then((data) => {
@@ -115,5 +117,9 @@ router.delete("/id=:id", (req, res) => {
       throw err;
     });
 });
+
+router.post("/register", signup, function (req, res) {});
+
+router.post("/login", signin, function (req, res) {});
 
 module.exports = router;
