@@ -1,37 +1,14 @@
 const express = require("express");
-const { unlink } = require("fs");
 const multer = require("multer");
 
-const fileParser = require("./fileParser");
-const { signin, signup } = require("./authController");
-const People = require("./schema/sampleSchema");
 const authWare = require("./authMiddleware");
+const People = require("./schema/sampleSchema");
+const { signin, signup } = require("./authController");
 
 const router = express();
-const upload = multer({ dest: "public/upload/" });
-router.use(express.json());
-
-// Send CSV to DB
-router.put("/", upload.single("csvFile"), async (req, res) => {
-  const { path: filePath } = req.file;
-  const parsedObject = await fileParser(filePath);
-
-  People.create(parsedObject)
-    .then(() => {
-      console.log("Data sent to DB");
-      unlink(filePath, (err) => {
-        if (err) throw err;
-        console.log("Deleted raw CSV file");
-      });
-      res.json(parsedObject);
-    })
-    .catch((err) => {
-      res.sendStatus(501);
-      throw err;
-    });
-});
-
+const upload = multer();
 router.use(upload.array());
+router.use(express.json());
 
 // Create
 router.post("/", authWare, (req, res) => {
@@ -87,6 +64,10 @@ router.get("/id=:id", authWare, (req, res) => {
 // Update
 router.post("/id=:id", authWare, (req, res) => {
   const { id } = req.params;
+  if (Object.keys(req.body).length === 0) {
+    res.sendStatus(400);
+  }
+  console.log(req.body);
   People.findByIdAndUpdate(id, req.body)
     .then((data) => {
       if (data == null) res.sendStatus(404);
