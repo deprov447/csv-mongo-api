@@ -1,23 +1,37 @@
 # CSV - Mongo API
 
-## Steps to start the server
+This repo consist of 2 seperate APIs:
+
+- **parserAPI**: Has route that parses and sends a CSV file to MongoDB
+- **crudAPI**: Has basic CRUD routes to work on previously uploaded data.
+
+> [demoCSVFile/myFile.csv](https://github.com/deprov447/csv-mongo-api/blob/master/demoCSVFile/myFile.csv) is the file according to which the schema for both APIs is defined.
+
+## Steps to start the servers
 
 - `git clone https://github.com/deprov447/csv-mongo-api.git`
 - `cd csv-mongo-api`
-- Edit `.env.example` file to add your desired port number & your database address
+- Now `cd` into one of the two APIs (ideally in order: parserAPI > crudAPI)
+- Edit `.env.example` file to add your desired port number and database address
 - `mv .env.example .env` (Renaming .env.example file to .env)
 - `npm i`
 - `npm start`
 
-## API Documentation
+# API Documentation
 
-> Please go to [this](https://go.postman.co/workspace/csv-mongo-api~19a68cb9-e941-43e9-9eeb-f73235ea41ab/collection/19226753-9756a146-33b2-424a-9727-e09246dd14e6) postman workspace for more.
+> Please go to [this](https://www.postman.com/deprov447/workspace/csv-mongo-api/overview) postman workspace for more.
 
-### Upload CSV
+## Parser API
 
 **`PUT` req to `/`**
 
-Specify a CSV file in `req body (form-data)` with field-name `csvFile` (a demo csv file is given [here](https://github.com/deprov447/csv-mongo-api/blob/master/democsvfile/myFile.csv))
+> Remember to `/register` and `/login` beforehand to get valid JWT token and place them in req.headers with key-value: `Authorization`: `JWT <token>`.
+
+Specify a CSV file in `req body (form-data)` with field-name `csvFile` (a demo csv file is given [here](https://github.com/deprov447/csv-mongo-api/blob/master/demoCSVFile/myFile.csv))
+
+---
+
+## CRUD API
 
 ### Create
 
